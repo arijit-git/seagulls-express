@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="keywords" content="D3.js,Force-Directed Graph">
+    <title>D3-Force Directed Graph</title>
+    <!-- <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js?1.25.0"></script> -->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    
+<style type="text/css">
+
+.node {
+  cursor: pointer;
+}
+
+.desc{
+    /*border: #000 solid thin;*/
+    text-align: center;
+    font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    color:#660000;
+    width:800px;
+    margin:auto;
+  }
+
+path.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1px;
+}
+
+
+text {
+  fill: #000;
+  font: 13px sans-serif;
+  pointer-events: none;
+  font-weight: bold;
+}
+.main{
+  min-height: 800px;
+  height: 100%;
+}
+    </style>
+<script type="text/javascript">
+
+var w = 700,
+    h = 600,
+    node,
+    path,
+    root,nodes,links,rootNode,id=19;
+
+var force,vis;
+var LoadData = true;
+
+
+var url = "http://localhost:3000/getJsonHealth";
+d3.json(url, function(error, data) {
+	
+	if(error)
+	  {
+		d3.select('#chart')
+	    .html('<p style="color: red;">No Data from API</p>');
+	    return console.error(error);
+	  }
+	else
+		{
+			root= data;
+		
+		}
+
+});
+
+function update() {
+   if (force) force.stop();
+  nodes = flatten(root);
+  links = d3.layout.tree().links(nodes);
+
+  // Restart the force layout.
+  force
+      .nodes(nodes)
+      .links(links)
+      .linkDistance(100)
+      .charge(-1500)
+      .theta(1)
+      .gravity(0.03)
+      .start();
+
+  vis.selectAll("path").remove();    
+  vis.selectAll(".node").remove();
+  
+  path = vis.selectAll("path.link");
+  path = path.data(force.links());
+  path.exit().remove();
+  path
+      .enter().append("svg:path")
+      .attr("class", "link")
+      .attr("marker-end", "url(#end)");
+
+  node = vis.selectAll(".node");
+  node = node.data(force.nodes());
+  node.exit().remove();
+    node
+        .enter().append("g")
+        .attr("class", "node")
+        .on("click", click)
+        .call(force.drag);
+
+   node.append("image")
+      .attr("xlink:href", function(d){return d.imageURL;})
+      .attr("class","image")
+      .attr("x", -20)
+      .attr("y", -20)
+      .attr("width",70)
+      .attr("height",70);
+	
+ node.append("image")
+      .attr("xlink:href", function(d){return d.state;})
+      .attr("class","image")
+      .attr("x", 50)
+      .attr("y", 40)
+      .attr("width",15)
+      .attr("height",15);	
+	  
+
+    node.append("text")
+      .attr("class","text")
+      .attr("x",50)//changed
+      .attr("dy", ".80em")
+      .style("fill", color)
+      .text(function(d) {return d.name; });
+}
+
+function tick() {
+  path.attr("d", function(d) {
+
+        if(d.source.id == rootNode.id){
+          d.source.x = (w/2-15);
+          d.source.y = (h/2-15);
+        }
+      
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy);
+        return "M" + 
+            d.source.x + "," + 
+            d.source.y + "A" + 
+            dr + "," + dr + " 0 0,1 " + 
+            d.target.x + "," + 
+            d.target.y;
+    });
+
+  node.attr("transform", function(d) {
+
+    if(d.id == rootNode.id){
+      return "translate(" + ((w/2)-20) + "," + ((h/2)-20) + ")";
+    }
+    return "translate(" + d.x + "," + d.y + ")"; });
+  
+}
+
+function color(d) {
+  //return d._children ? "#0000FF" : d.children ? "#2B60DE" : "#fd8d3c";
+  return  d.errorstate=="NO" ? "#2B60DE" : "#FF0000";
+}
+// Toggle children on click.
+function click(d) {
+  
+  if ((d.children != null || d.children != undefined) || (d._children != null || d._children != undefined)) {
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      } else {
+        d.children = d._children;
+        d._children = null;
+      }
+      update();
+  }
+  
+}
+
+var findNode = function (node) {
+    for (var i in force.nodes()) {
+        if (force.nodes()[i] === node) return true
+    };
+  return false;
+}
+
+// Returns a list of all nodes under the root.
+function flatten(root) {
+  var nodes = [], i = 0;
+
+  function recurse(node) {
+    if (node.children) node.children.forEach(recurse);
+    if (!node.id) node.id = ++i;
+    nodes.push(node);
+  }
+
+  rootNode = root;
+  recurse(root);
+  
+  return nodes;
+}
+function loadImage(){
+  if(LoadData){
+ /* root = {
+"name": "SloaD", "imageURL":"images/application.jpg","id":"1","errorstate":"NO","state":"images/warning.png",
+"children": [
+  {"name": "SloaD DB", "imageURL":"images/DB.png","id":"2","errorstate":"NO","state":"images/success.png"
+  },
+
+  {"name": "LG DB", "imageURL":"images/DB.png","id":"5", "errorstate":"NO","state":"images/success.png",
+  "children":[{"name": "STRADA", "imageURL":"images/application.jpg","id":"6","errorstate":"NO","state":"images/success.png"},
+              {"name": "TIBCO", "imageURL":"images/application.jpg","id":"7","errorstate":"NO","state":"images/success.png"}]},
+
+  {"name": "Active MQ", "imageURL":"images/MQ.png","id":"8" ,"errorstate":"NO","state":"images/success.png"
+  },
+
+  {"name": "ICMP", "imageURL":"images/application.jpg","id":"12","errorstate":"YES","state":"images/warning.png",
+  "children":[{"name": "LMCA", "imageURL":"images/application.jpg","id":"13","errorstate":"YES","state":"images/warning.png"},
+              {"name": "HPA", "imageURL":"images/application.jpg","id":"14","errorstate":"YES","state":"images/warning.png"},
+              {"name": "CORE", "imageURL":"images/application.jpg","id":"15","errorstate":"YES","state":"images/warning.png"}]},
+
+  {"name": "LG NAS", "imageURL":"images/NAS.png","id":"16","errorstate":"NO","state":"images/success.png",
+  "children":[{"name": "Letter Extracts", "imageURL":"images/application.jpg","id":"17","errorstate":"NO","state":"images/success.png"}
+              ]}
+]
+};  */
+
+
+force = d3.layout.force()
+    .on("tick", tick)
+    .size([w, h]);
+
+vis = d3.select("#chart").append("svg:svg")
+    .attr("width", w)
+    .attr("height", h);
+  update();
+  LoadData = false;
+}
+}
+
+
+
+    </script>
+  </head>
+<body onLoad="loadImage();">
+<div style="margin:50px;">
+    <nav class="navbar navbar-inverse navbar-static-top">
+  <div class="container">
+    <a class="navbar-brand" href="/">Enterprise Application Health</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="/">Home</a>
+      </li>
+      <li >
+        <a href="/portfolio">Application Portfolio</a>
+      </li>
+      <li class="active">
+        <a href="/apphealth">Application Health</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="jumbotron"  style="padding:40px;">
+      <h1>Application Health Check !</h1>
+      <p>This is a simple health check unit information for applications. Live update on application health checks.</p>
+      <div id="chart"></div>
+      
+</div>
+</div>
+
+
+  
+  </body>
+</html>

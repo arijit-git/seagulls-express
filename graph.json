@@ -1,0 +1,105 @@
+{
+    "name": "CLT",
+    "parent": "null",
+    "value": "20",
+    "type": "black",
+    "availability": "98.99%",
+    "dependency":"10",
+    "level": "yellow",
+    "children": [
+      {
+        "name": "ICMP",
+        "parent": "CLT",
+        "value": "10",
+        "type": "grey",
+        "availability": "98.09%",
+        "dependency":"3",
+        "level": "red",
+        "children": [
+          {
+            "name": "ERLMF",
+            "parent": "ICMP",
+            "value": "5",
+            "type": "steelblue",
+            "availability": "99.99%",
+            "dependency":"0",
+            "level": "green"
+          },
+          {
+            "name": "Early Resolution",
+            "parent": "ICMP",
+            "value": "5",
+            "type": "steelblue",
+            "availability": "90.99%",
+            "dependency":"0",
+            "level": "red"
+          },
+          {
+            "name": "LRT",
+            "parent": "ICMP",
+            "value": "5",
+            "type": "steelblue",
+            "availability": "98.99%",
+            "dependency":"0",
+            "level": "green"
+          }
+        ]
+      },
+      {
+        "name": "Middleware TIBCO",
+        "parent": "CLT",
+        "value": "10",
+        "type": "grey",
+        "availability": "98.99%",
+        "dependency":"5",
+        "level": "green"
+      },
+      {
+        "name": "Lending Grid",
+        "parent": "CLT",
+        "value": "10",
+        "type": "grey",
+        "level": "green",
+        "availability": "98.99%",
+        "dependency":"5",
+        "children": [
+          {
+            "name": "ERLMF",
+            "parent": "Lending Grid",
+            "value": "5",
+            "type": "steelblue",
+            "availability": "98.99%",
+            "dependency":"0",
+            "level": "green"
+          },
+          {
+            "name": "Early Resolution",
+            "parent": "Lending Grid",
+            "value": "5",
+            "type": "steelblue",
+            "availability": "98.99%",
+            "dependency":"0",
+            "level": "green"
+          },
+          {
+            "name": "TIBCO",
+            "parent": "Lending Grid",
+            "value": "5",
+            "type": "steelblue",
+            "availability": "98.99%",
+            "dependency":"0",
+            "level": "green"
+          }
+        ]
+      },
+      {
+        "name": "LossMitigation",
+        "parent": "CLT",
+        "value": "10",
+        "type": "grey",
+        "availability": "98.99%",
+        "dependency":"4",
+        "level": "green"
+      }
+    ]
+  }

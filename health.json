@@ -1,0 +1,23 @@
+{
+"name": "SloaD", "imageURL":"images/application.jpg","id":"1","errorstate":"NO","state":"images/warning.png",
+"children": [
+  {"name": "SloaD DB", "imageURL":"images/DB.png","id":"2","errorstate":"NO","state":"images/success.png"
+  },
+
+  {"name": "LG DB", "imageURL":"images/DB.png","id":"5", "errorstate":"NO","state":"images/success.png",
+  "children":[{"name": "STRADA", "imageURL":"images/application.jpg","id":"6","errorstate":"NO","state":"images/success.png"},
+              {"name": "TIBCO", "imageURL":"images/application.jpg","id":"7","errorstate":"NO","state":"images/success.png"}]},
+
+  {"name": "Active MQ", "imageURL":"images/MQ.png","id":"8" ,"errorstate":"NO","state":"images/success.png"
+  },
+
+  {"name": "ICMP", "imageURL":"images/application.jpg","id":"12","errorstate":"YES","state":"images/warning.png",
+  "children":[{"name": "LMCA", "imageURL":"images/application.jpg","id":"13","errorstate":"YES","state":"images/warning.png"},
+              {"name": "HPA", "imageURL":"images/application.jpg","id":"14","errorstate":"YES","state":"images/warning.png"},
+              {"name": "CORE", "imageURL":"images/application.jpg","id":"15","errorstate":"YES","state":"images/warning.png"}]},
+
+  {"name": "LG NAS", "imageURL":"images/NAS.png","id":"16","errorstate":"NO","state":"images/success.png",
+  "children":[{"name": "Letter Extracts", "imageURL":"images/application.jpg","id":"17","errorstate":"NO","state":"images/success.png"}
+              ]}
+]
+}
