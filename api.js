@@ -22,3 +22,9 @@ var obj2 = JSON.parse(fs.readFileSync('health.json', 'utf8'));
 app.get("/getJsonHealth", (req, res, next) => {
 	 res.json(obj2);
 	});
+
+var obj3 = JSON.parse(fs.readFileSync('apps.json', 'utf8'));
+
+app.get("/getApps", (req, res, next) => {
+	 res.json(obj3);
+	});

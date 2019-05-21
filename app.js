@@ -60,8 +60,6 @@ router.get('/apphealth',function(req,res){
 
 
 
-
-
 //add the router
 app.use('/', router);
 app.listen(process.env.port || 3030);

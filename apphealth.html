@@ -155,24 +155,24 @@ function update() {
 
         		);
 
-   node.append("image")
+    var images = node.append("image")
       .attr("xlink:href", function(d){return d.imageURL;})
       .attr("class","image")
       .attr("x", -20)
       .attr("y", -20)
-      .attr("width",70)
-      .attr("height",70)
+      .attr("width",50)
+      .attr("height",50)
       //.call(
     		//  d3.helper.tooltip()
     	      //.text(function(d, i){return (("App Name: ").bold()+d.name) + " " + (("Dependents: ").bold()+ d.dependency) + " " + (("Availability: ").bold()) + d.availability ;})
 			//function(d, i) { alert(d.name); return  (("App Name: ").bold()+d.name) + " " + (("ERROR: ").bold()+ d.errorstate);}
      // );
 	
- node.append("image")
+  node.append("image")
       .attr("xlink:href", function(d){return d.state;})
       .attr("class","image")
-      .attr("x", 50)
-      .attr("y", 40)
+      .attr("x", -25)
+      .attr("y", -25)
       .attr("width",15)
       .attr("height",15);	
 	  
@@ -183,6 +183,43 @@ function update() {
       .attr("dy", ".80em")
       .style("fill", color)
       .text(function(d) {return d.name; });
+    
+ // make the image grow a little on mouse over and add the text details on click
+    var setEvents = images
+            // Append hero text
+            .on( 'click', function (d) {
+                d3.select("h1").html(d.name); 
+                d3.select("h2").html(d.nme); 
+                d3.select("h3").html ("Take me to " + "<a href='" + d.link + "' >"  + d.name + " web page ⇢"+ "</a>" ); 
+             })
+
+            .on( 'mouseenter', function() {
+              // select element in current context
+              d3.select( this )
+                .transition()
+                .attr("x", function(d) { return -60;})
+                .attr("y", function(d) { return -60;})
+                .attr("height", 100)
+                .attr("width", 100);
+            })
+            // set back
+            .on( 'mouseleave', function() {
+              d3.select( this )
+                .transition()
+                .attr("x", function(d) { return -25;})
+                .attr("y", function(d) { return -25;})
+                .attr("height", 50)
+                .attr("width", 50);
+            });
+
+    // Append hero name on roll over next to the node as well
+    node.append("text")
+        .attr("class", "nodetext")
+        .attr("x", x_browser)
+        .attr("y", y_browser +15)
+        .attr("fill", tcBlack)
+        .text(function(d) { return d.name; });
+    
 }
 
 function tick() {
@@ -361,12 +398,40 @@ return this;
 return tooltip;
 };
 
+function getHealthStatus(url){
+	$('#chart').remove();
+	$("#container").append('<div id="chart"></div>');
+	
+	d3.json(url, function(error, data) {
+		
+		if(error)
+		  {
+			d3.select('#chart')
+		    .html('<p style="color: red;">Health Check API is not available. You will not get expected functionalities.</p>');
+		    return console.error(error);
+		  }
+		else
+			{
+				root= data;
+				force = d3.layout.force()
+			    .on("tick", tick)
+			    .size([w, h]);
 
+			vis = d3.select("#chart").append("svg:svg")
+			    .attr("width", w)
+			   .attr("height", h);
+			  update();
+			  LoadData = false;
+			
+			}
+
+	});
+}
 
     </script>
   </head>
 <body>
-<div style="margin:50px;">
+<div style="margin-top:50px; margin-left:50px; margin-right:50px;" id="container">
     <nav class="navbar navbar-inverse navbar-static-top">
   <div class="container">
     <a class="navbar-brand active" href="/" style="color: white">Enterprise Application Health</a>
@@ -384,7 +449,7 @@ return tooltip;
   </div>
 </nav>
 
-<div class="jumbotron"  style="padding:40px;">
+<div class="jumbotron"  style="padding:40px;" >
       <h1>Application Health Check !</h1>
       <p>This is a simple health check unit information for applications. Live update on application health checks.</p>
       
@@ -398,16 +463,29 @@ return tooltip;
       </div>
       <a class="btn btn-primary btn-md"  role="button" id="btnHealth">Show Health</a>
       </div>
-      <div id="chart" ></div>
-      
 </div>
+<div id="chart" ></div>
 </div>
 
 <script>
+//get a reference to the select element
+    var $select = $('#appSelect');
+ 
+    //request the JSON data and parse into the select element
+    $.getJSON('http://localhost:3000/getApps', function(data){
+ 
+      //clear the current content of the select
+      $select.html('');
+ 
+      //iterate over the data and append a select option
+      $.each(data.applications, function(key, val){	  
+        $select.append('<option id="' + val.App_id + '">' + val.Application_name + '</option>');
+      })
+    });
 $(document).ready(function(){
     $('#btnHealth').click(function(){
-    	getJSON();
-		loadImage();
+    	var url = "http://localhost:3000/getJsonHealth";
+    	getHealthStatus(url);
      });
     
 });

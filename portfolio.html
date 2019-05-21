@@ -65,7 +65,7 @@ font-weight:bold;
 
   </head>
 
-<body onload="getPortfolio()">
+<body >
 <div style="margin:50px;">
     <nav class="navbar navbar-inverse navbar-static-top">
   <div class="container">
@@ -84,9 +84,19 @@ font-weight:bold;
   </div>
 </nav>
 
-<div class="jumbotron"  style="padding:40px;">
+<div class="jumbotron"  style="padding:40px;" id="container">
       <h1>Application Portfolio !</h1>
       <p>This is a simple portfolio unit information for applications.</p>
+      <div class="form-group">
+      <label class="col-xs-1 control-label" for="portSelect">Application</label>
+      <div class="col-xs-2">
+      <select class="form-control" id="appSelect">
+      <option value="SLOAD">MARVEL</option>
+      <option value="LMCS">LIONS GATE</option>
+      </select>
+      </div>
+      <a class="btn btn-primary btn-md"  role="button" id="btnPortfolio">View Portfolio</a>
+      </div>
       <div id="tree"></div>
       
 </div>
@@ -114,7 +124,7 @@ var svg = d3.select("#tree").append("svg")
     .append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
-var url = "http://localhost:3000/getJsonPortfolio";
+//var url = "http://localhost:3000/getJsonPortfolio";
 
 
 var count;
@@ -312,7 +322,9 @@ return tooltip;
 };
 
  
-function getPortfolio(){
+function getPortfolio(url){
+	//$('#tree').remove();
+	//$("#container").append('<div id="tree"></div>');
  d3.json(url, function(error, flare) {
 		
 		if(error)
@@ -334,6 +346,28 @@ function getPortfolio(){
  
 d3.select(self.frameElement).style("height", "500px");
 }
+
+var $select = $('#portSelect');
+
+//request the JSON data and parse into the select element
+$.getJSON('http://localhost:3000/getApps', function(data){
+
+  //clear the current content of the select
+  $select.html('');
+
+  //iterate over the data and append a select option
+  $.each(data.applications, function(key, val){	  
+    $select.append('<option id="' + val.App_id + '">' + val.Application_name + '</option>');
+  })
+});
+
+$(document).ready(function(){
+    $('#btnPortfolio').click(function(){
+    	var url = "http://localhost:3000/getJsonPortfolio";
+    	getPortfolio(url);
+     });
+    
+});
 </script>
 </body>
 </html>
